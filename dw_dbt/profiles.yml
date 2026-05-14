@@ -1,0 +1,5 @@
+dw_dbt:
+  outputs:
+    dev:
+      type: duckdb
+  target: dev
