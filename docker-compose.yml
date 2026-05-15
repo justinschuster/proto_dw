@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: proto-dw-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: proto_dw
+      POSTGRES_USER: proto
+      POSTGRES_PASSWORD: proto
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U proto -d proto_dw"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
