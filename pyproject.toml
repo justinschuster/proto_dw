@@ -10,3 +10,16 @@ dependencies = [
     "dlt>=1.26.0",
     "duckdb>=1.5.2",
 ]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.3",
+    "pytest-cov>=7.1.0",
+    "ruff>=0.15.13",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+
+[tool.ruff]
+extend-exclude = ["test_*.py"]
