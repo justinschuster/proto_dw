@@ -11,3 +11,7 @@ wheels/
 
 # Misc
 logs/
+.env
+
+# dlt
+.dlt/secrets.toml

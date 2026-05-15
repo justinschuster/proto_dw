@@ -5,6 +5,7 @@ v0.1.0
 ## Added
 
 - Added docker-compose file with Postgres database for local development.
+- Added dlt v1.26
 
 ## Changed
 
