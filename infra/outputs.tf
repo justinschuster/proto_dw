@@ -12,3 +12,13 @@ output "environment" {
   description = "Deployment environment name."
   value       = var.environment
 }
+
+output "raw_data_bucket_name" {
+  description = "Name of the S3 bucket for raw extracted data."
+  value       = aws_s3_bucket.raw_data.bucket
+}
+
+output "raw_data_bucket_arn" {
+  description = "ARN of the S3 bucket for raw extracted data."
+  value       = aws_s3_bucket.raw_data.arn
+}

@@ -12,6 +12,12 @@ No DynamoDB lock table is configured.
 
 The AWS provider defaults to `us-east-2`. Override `aws_region` in a local `.tfvars` file if a different region is needed.
 
+## Raw Data Bucket
+
+The `raw_data_bucket_name` variable configures the S3 bucket used to store raw data extracted by pipelines. It defaults to `proto-dw-raw-data`.
+
+The bucket is private, blocks public access, enables server-side encryption, enables versioning, and disables ACLs with bucket-owner-enforced ownership.
+
 ## Usage
 
 AWS credentials must have access to the S3 backend bucket before initializing Terraform.

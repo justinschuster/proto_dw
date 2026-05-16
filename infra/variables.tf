@@ -15,3 +15,9 @@ variable "environment" {
   type        = string
   default     = "dev"
 }
+
+variable "raw_data_bucket_name" {
+  description = "S3 bucket name for raw extracted data."
+  type        = string
+  default     = "proto-dw-raw-data"
+}

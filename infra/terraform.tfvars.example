@@ -1,3 +1,5 @@
 aws_region   = "us-east-2"
 project_name = "proto-dw"
 environment  = "dev"
+
+raw_data_bucket_name = "proto-dw-raw-data"

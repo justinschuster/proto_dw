@@ -22,3 +22,6 @@ logs/
 
 # testing
 .coverage
+
+# terraform
+*.tfplan
