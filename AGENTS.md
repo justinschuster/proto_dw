@@ -18,6 +18,7 @@ This repository provides ETL code for common free data sources.
 - `dags/` - Airflow DAGs for orchestration.
 - `pyproject.toml`, `uv.lock`: Python dependencies and tool configuration.
 - `dbt/db_project.yaml`, `dbt/profiles.yaml`: DBT project configuration.
+- `.github/PULL_REQUEST_TEMPLATE/pull_request_template.md`: Pull request template to use when opening PRs.
 
 ## Operation Guide
 
@@ -46,6 +47,10 @@ This repository provides ETL code for common free data sources.
   ```bash
   uv run pytest -s -k <pattern>
   ```
+- Run a focused test:
+  ```bash
+  make typecheck
+  ```
 
 #### Coverage
 
@@ -54,7 +59,7 @@ This repository provides ETL code for common free data sources.
   make coverage
   ```
 
-#### Formatting, linting, and type checking
+#### Formatting, linting
 
 - Formatting and linting use `ruff`; run `make format` (applies fixes) and `make lint` (checks only).
 - Type hints must pass `make typecheck`.
@@ -68,6 +73,7 @@ When `$code-change-verification` applies, run the full sequence in order (or use
 ```bash
 make format
 make lint
+make typecheck
 make tests
 ```
 
@@ -78,4 +84,19 @@ make tests
   make sync
   ```
 - Review `Makefile` for common commands and use `uv run` for Python invocations.
-- Consult `tests/README.md` for test and snapshot workflows.
+
+### Pull Request & Commit Guidelines
+
+- Use the template at `.github/PULL_REQUEST_TEMPLATE/pull_request_template.md`; include a summary, test plan, and issue number if applicable.
+- Add tests for new behavior when feasible and update documentation for user-facing changes.
+- Run `make format`, `make lint`, `make typecheck`, and `make tests` before marking work ready.
+- Commit messages should be concise and written in the imperative mood. Small, focused commits are preferred.
+
+### Review Process & What Reviewers Look For
+
+- ✅ Checks pass (`make format`, `make lint`, `make typecheck`, `make tests`).
+- ✅ Tests cover new behavior and edge cases.
+- ✅ Code is readable, maintainable, and consistent with existing style.
+- ✅ Public APIs and user-facing behavior changes are documented.
+- ✅ Examples are updated if behavior changes.
+- ✅ History is clean with a clear PR description.

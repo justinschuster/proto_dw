@@ -5,24 +5,32 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "dbt-core>=1.11.10",
-    "dbt-postgres>=1.10.0",
-    "dlt>=1.26.0",
+    "dbt-core~=1.11.10",
+    "dbt-postgres~=1.10.0",
+    "dlt~=1.26.0",
 ]
 
 [dependency-groups]
 dev = [
-    "mypy>=1.19.1",
-    "pytest>=9.0.3",
-    "pytest-cov>=7.1.0",
-    "ruff>=0.15.13",
+    "mypy~=1.19.1",
+    "pyright~=1.1.409",
+    "pytest~=9.0.3",
+    "pytest-cov~=7.1.0",
+    "ruff~=0.15.13",
 ]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
+
+[tool.ruff.lint.per-file-ignores]
+"examples/**/*.py" = ["E501"]
 
 [tool.mypy]
 strict = true
