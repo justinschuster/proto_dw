@@ -46,7 +46,9 @@ def test_usaspending_def_codes_fails_on_empty_response(monkeypatch: Any) -> None
 
     source = extract_usaspending.usaspending(base_url="https://example.test/api/v2/")
 
-    with pytest.raises(ResourceExtractionError, match="DEFC endpoint returned no records"):
+    with pytest.raises(
+        ResourceExtractionError, match="DEFC endpoint returned no records"
+    ):
         list(source.resources["def_codes"])
 
 
