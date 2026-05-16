@@ -51,3 +51,17 @@ snapshots-create:
 .PHONY: check
 check: format-check lint typecheck tests
 
+.PHONY: terraform-fmt
+terraform-fmt:
+	terraform -chdir=infra fmt -recursive
+
+.PHONY: terraform-init
+terraform-init:
+	terraform -chdir=infra init
+
+.PHONY: terraform-validate
+terraform-validate:
+	terraform -chdir=infra validate
+
+.PHONY: terraform-check
+terraform-check: terraform-fmt terraform-init terraform-validate

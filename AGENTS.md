@@ -77,6 +77,16 @@ make typecheck
 make tests
 ```
 
+#### Terraform
+
+Terraform infrastructure lives in `infra/`.
+
+When modifying Terraform code, run:
+
+```bash
+make terraform-check
+```
+
 ### Utilities & Tips
 
 - Install or refresh development dependencies:
