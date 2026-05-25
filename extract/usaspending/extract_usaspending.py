@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 @dlt.source
 def usaspending(base_url: str = dlt.config.value) -> Any:
-    """Create a dlt source for USAspending.gov API reference resources.
+    """Create a dlt source for USAspending.gov API resources.
 
     Args:
         base_url: Base URL for the USAspending API. By default, dlt resolves
@@ -20,21 +20,25 @@ def usaspending(base_url: str = dlt.config.value) -> Any:
             USAspending-compatible environment.
 
     Returns:
-        A dlt source containing the `def_codes` resource.
+        A dlt source containing the `def_codes` and `agency_awards_count`
+        resources.
     """
 
-    def _get_json(path: str) -> StrAny:
-        """Fetch a USAspending API path as JSON.
+    def _get_json(path: str, params: dict[str, Any] | None = None) -> StrAny:
+        """Fetch a USAspending API path as a JSON object.
 
         Args:
             path: Endpoint path relative to `base_url`, for example
                 `references/def_codes/`.
+            params: Optional query parameters to pass to the request, for
+                example `{"page": 2}` for paginated endpoints.
 
         Returns:
-            Parsed JSON response as a string-keyed dictionary.
+            Parsed JSON response as a string-keyed dictionary preserving the
+            endpoint response shape.
         """
         logger.info(f"Fetching USAspending endpoint path={path}")
-        response = client.get(f"{base_url}{path}")
+        response = client.get(f"{base_url}{path}", params=params)
         payload = cast("StrAny", response.json())
         logger.info(f"Fetched USAspending endpoint path={path}")
         return payload
@@ -61,7 +65,45 @@ def usaspending(base_url: str = dlt.config.value) -> Any:
 
         yield from codes
 
-    return get_def_codes()
+    @dlt.resource(
+        name="agency_awards_count",
+        write_disposition="append",
+    )
+    def get_agency_awards_count() -> Iterator[TDataItems]:
+        """Yield raw paginated award-count response envelopes from USAspending.gov.
+
+        Returns:
+            An iterator of unmodified page payloads from the
+            `agency/awards/count/` endpoint. Each yielded item preserves the
+            endpoint response envelope, including `results`, `page_metadata`,
+            and `messages`.
+        """
+        page = 1
+
+        while True:
+            payload = _get_json("agency/awards/count/", params={"page": page})
+            page_metadata = payload.get("page_metadata")
+            if not isinstance(page_metadata, dict):
+                msg = "Agency awards count endpoint returned invalid page metadata"
+                logger.error(msg)
+                raise ValueError(msg)
+
+            logger.info(f"Fetched agency awards count page={page}")
+            yield payload
+
+            next_page = page_metadata.get("next")
+            has_next = page_metadata.get("hasNext")
+            if next_page is None or has_next is False:
+                break
+
+            if not isinstance(next_page, int):
+                msg = "Agency awards count endpoint returned invalid next page"
+                logger.error(msg)
+                raise ValueError(msg)
+
+            page = next_page
+
+    return get_def_codes, get_agency_awards_count
 
 
 def load_data(pipeline: Any, data: Any) -> Any:
