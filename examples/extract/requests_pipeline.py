@@ -47,7 +47,7 @@ def load_chess_data() -> None:
     # otherwise the defaults will be used that are derived from the current script name
     p = dlt.pipeline(
         pipeline_name="chess",
-        destination='filesystem',
+        destination="filesystem",
         dataset_name="chess_data",
     )
 
