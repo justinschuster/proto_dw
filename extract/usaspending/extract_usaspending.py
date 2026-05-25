@@ -23,7 +23,7 @@ def usaspending(base_url: str = dlt.config.value) -> Any:
         A dlt source containing the `def_codes` resource.
     """
 
-    def _get_json(path: str) -> StrAny:
+    def _get_json(path: str, params: dict[str, Any] | None = None) -> StrAny:
         """Fetch a USAspending API path as JSON.
 
         Args:
@@ -34,7 +34,7 @@ def usaspending(base_url: str = dlt.config.value) -> Any:
             Parsed JSON response as a string-keyed dictionary.
         """
         logger.info(f"Fetching USAspending endpoint path={path}")
-        response = client.get(f"{base_url}{path}")
+        response = client.get(f"{base_url}{path}", params=params)
         payload = cast("StrAny", response.json())
         logger.info(f"Fetched USAspending endpoint path={path}")
         return payload
@@ -61,7 +61,43 @@ def usaspending(base_url: str = dlt.config.value) -> Any:
 
         yield from codes
 
-    return get_def_codes()
+    @dlt.resource(
+        name="agency_awards_count",
+        write_disposition="append",
+    )
+    def get_agency_awards_count() -> Iterator[TDataItems]:
+        """Yield raw paginated award-count response envelopes from USAspending.gov.
+
+        Returns:
+            An iterator of unmodified page payloads from the
+            `agency/awards/count/` endpoint.
+        """
+        page = 1
+
+        while True:
+            payload = _get_json("agency/awards/count/", params={"page": page})
+            page_metadata = payload.get("page_metadata")
+            if not isinstance(page_metadata, dict):
+                msg = "Agency awards count endpoint returned invalid page metadata"
+                logger.error(msg)
+                raise ValueError(msg)
+
+            logger.info(f"Fetched agency awards count page={page}")
+            yield payload
+
+            next_page = page_metadata.get("next")
+            has_next = page_metadata.get("hasNext")
+            if next_page is None or has_next is False:
+                break
+
+            if not isinstance(next_page, int):
+                msg = "Agency awards count endpoint returned invalid next page"
+                logger.error(msg)
+                raise ValueError(msg)
+
+            page = next_page
+
+    return get_def_codes, get_agency_awards_count
 
 
 def load_data(pipeline: Any, data: Any) -> Any:
