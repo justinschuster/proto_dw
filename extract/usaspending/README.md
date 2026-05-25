@@ -1,20 +1,6 @@
 # USAspending Extract
 
-This package contains the dlt extraction pipeline for USAspending.gov data.
+This package contains the dlt extraction pipeline for USAspending.gov data as defined by `https://api.usaspending.gov/docs/endpoints`.
 
-The initial implementation loads Disaster Emergency Fund Code (DEFC) reference data from `https://api.usaspending.gov/api/v2/references/def_codes/` into the local Postgres destination configured by dlt in `.dlt/secrets.toml`.
-
-The DEFC resource uses `code` as the primary key and `merge` write disposition so repeated runs are idempotent.
-
-Run the extract with:
-
-```bash
-uv run python -m extract.usaspending.extract_usaspending
-```
-
-Run validation with:
-
-```bash
-uv run ruff check .
-uv run pytest
-```
+AWS credentials should come from `~/.aws/credentials`, environment variables, an IAM role, or non-committed dlt secrets.
+The raw data bucket is defined in `./dlt/secrets.toml`.

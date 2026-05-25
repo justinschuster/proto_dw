@@ -42,7 +42,7 @@ def usaspending(base_url: str = dlt.config.value) -> Any:
     @dlt.resource(
         name="def_codes",
         primary_key="code",
-        write_disposition="merge",
+        write_disposition="append",
         columns={"urls": {"data_type": "json"}},
     )
     def get_def_codes() -> Iterator[TDataItems]:
@@ -65,7 +65,7 @@ def usaspending(base_url: str = dlt.config.value) -> Any:
 
 
 def load_data(pipeline: Any, data: Any) -> Any:
-    """Run a dlt pipeline and log a simple destination row-count check.
+    """Run a dlt pipeline and log destination-neutral load metadata.
 
     Args:
         pipeline: Configured dlt pipeline instance.
@@ -74,7 +74,6 @@ def load_data(pipeline: Any, data: Any) -> Any:
     Returns:
         dlt load information from the pipeline run.
     """
-
     logger.info(
         f"Starting USAspending pipeline name={pipeline.pipeline_name} "
         f"dataset={pipeline.dataset_name}"
@@ -89,11 +88,6 @@ def load_data(pipeline: Any, data: Any) -> Any:
     logger.info(str(load_info))
 
     logger.info(f"Pipeline was started: {load_info.started_at}")
-    with pipeline.sql_client() as sql_client:
-        with sql_client.execute_query("SELECT COUNT(*) FROM def_codes") as cursor:
-            count = cursor.fetchone()[0]
-            logger.info(f"def_codes table contains {count} rows")
-
     normalize_info = pipeline.last_trace.last_normalize_info
     logger.info(f"Normalize row counts: {normalize_info.row_counts}")
 
@@ -107,7 +101,7 @@ def load_data(pipeline: Any, data: Any) -> Any:
 if __name__ == "__main__":
     pipeline = dlt.pipeline(
         pipeline_name="usaspending",
-        destination="postgres",
-        dataset_name="usaspending_raw",
+        destination="filesystem",
+        dataset_name="usaspending",
     )
     load_data(pipeline, usaspending())

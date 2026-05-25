@@ -27,7 +27,7 @@ def test_usaspending_def_codes_requests_expected_endpoint(
         calls.append(url)
         return FakeResponse()
 
-    monkeypatch.setattr(extract_usaspending.client, "get", fake_get)
+    monkeypatch.setattr(extract_usaspending.client, "get", fake_get)  # type: ignore[attr-defined]
     caplog.set_level(logging.INFO, logger=extract_usaspending.__name__)
 
     source = extract_usaspending.usaspending(base_url="https://example.test/api/v2/")
@@ -42,13 +42,11 @@ def test_usaspending_def_codes_fails_on_empty_response(monkeypatch: Any) -> None
     def fake_get(url: str) -> EmptyResponse:
         return EmptyResponse()
 
-    monkeypatch.setattr(extract_usaspending.client, "get", fake_get)
+    monkeypatch.setattr(extract_usaspending.client, "get", fake_get)  # type: ignore[attr-defined]
 
     source = extract_usaspending.usaspending(base_url="https://example.test/api/v2/")
 
-    with pytest.raises(
-        ResourceExtractionError, match="DEFC endpoint returned no records"
-    ):
+    with pytest.raises(ResourceExtractionError, match="DEFC endpoint returned no records"):
         list(source.resources["def_codes"])
 
 
@@ -58,7 +56,7 @@ def test_def_codes_resource_is_idempotent_reference_config() -> None:
     schema = resource.compute_table_schema()
 
     assert resource.name == "def_codes"
-    assert resource.write_disposition == "merge"
+    assert resource.write_disposition == "append"
     columns = schema.get("columns")
     assert columns is not None
     assert columns["code"]["primary_key"] is True
