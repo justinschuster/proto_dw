@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 @dlt.source
 def usaspending(base_url: str = dlt.config.value) -> Any:
-    """Create a dlt source for USAspending.gov API reference resources.
+    """Create a dlt source for USAspending.gov API resources.
 
     Args:
         base_url: Base URL for the USAspending API. By default, dlt resolves
@@ -20,18 +20,22 @@ def usaspending(base_url: str = dlt.config.value) -> Any:
             USAspending-compatible environment.
 
     Returns:
-        A dlt source containing the `def_codes` resource.
+        A dlt source containing the `def_codes` and `agency_awards_count`
+        resources.
     """
 
     def _get_json(path: str, params: dict[str, Any] | None = None) -> StrAny:
-        """Fetch a USAspending API path as JSON.
+        """Fetch a USAspending API path as a JSON object.
 
         Args:
             path: Endpoint path relative to `base_url`, for example
                 `references/def_codes/`.
+            params: Optional query parameters to pass to the request, for
+                example `{"page": 2}` for paginated endpoints.
 
         Returns:
-            Parsed JSON response as a string-keyed dictionary.
+            Parsed JSON response as a string-keyed dictionary preserving the
+            endpoint response shape.
         """
         logger.info(f"Fetching USAspending endpoint path={path}")
         response = client.get(f"{base_url}{path}", params=params)
@@ -70,7 +74,9 @@ def usaspending(base_url: str = dlt.config.value) -> Any:
 
         Returns:
             An iterator of unmodified page payloads from the
-            `agency/awards/count/` endpoint.
+            `agency/awards/count/` endpoint. Each yielded item preserves the
+            endpoint response envelope, including `results`, `page_metadata`,
+            and `messages`.
         """
         page = 1
 
