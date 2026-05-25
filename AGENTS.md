@@ -15,16 +15,16 @@ This repository provides ETL code for common free data sources.
 
 - `extract/` - Contains all extraction pipelines. Organized in folders by data source name.
 - `dbt/` - DBT project for all transformation logic.
-- `dags/` - Airflow DAGs for orchestration.
+- `infra/` - Terraform infrastructure for project cloud resources.
 - `pyproject.toml`, `uv.lock`: Python dependencies and tool configuration.
-- `dbt/db_project.yaml`, `dbt/profiles.yaml`: DBT project configuration.
+- `dbt/dbt_project.yml`, `dbt/profiles.yml`: DBT project configuration.
 - `.github/PULL_REQUEST_TEMPLATE/pull_request_template.md`: Pull request template to use when opening PRs.
 
 ## Operation Guide
 
 ### Prerequisites
 
-- Python 3.10+
+- Python 3.13+
 - `uv` installed for dependency management (`uv sync`) and `uv run` for Python commands.
 - `make` available to run repository tasks.
 
@@ -47,17 +47,18 @@ This repository provides ETL code for common free data sources.
   ```bash
   uv run pytest -s -k <pattern>
   ```
-- Run a focused test:
+- Run type checks:
   ```bash
   make typecheck
   ```
 
-#### Coverage
+#### Full local checks
 
-- Generate coverage (fails if coverage drops below threshold):
+- Run the standard local check suite:
   ```bash
-  make coverage
+  make check
   ```
+- `make check` runs `format-check`, `lint`, `typecheck`, and `tests`.
 
 #### Formatting, linting
 
@@ -68,7 +69,7 @@ This repository provides ETL code for common free data sources.
 
 #### Mandatory local run order
 
-When `$code-change-verification` applies, run the full sequence in order (or use the skill scripts):
+When `$code-change-verification` applies, run the full sequence in order (or use `make check` for a check-only run):
 
 ```bash
 make format
@@ -99,12 +100,12 @@ make terraform-check
 
 - Use the template at `.github/PULL_REQUEST_TEMPLATE/pull_request_template.md`; include a summary, test plan, and issue number if applicable.
 - Add tests for new behavior when feasible and update documentation for user-facing changes.
-- Run `make format`, `make lint`, `make typecheck`, and `make tests` before marking work ready.
+- Run `make check` before marking work ready.
 - Commit messages should be concise and written in the imperative mood. Small, focused commits are preferred.
 
 ### Review Process & What Reviewers Look For
 
-- ✅ Checks pass (`make format`, `make lint`, `make typecheck`, `make tests`).
+- ✅ Checks pass (`make check`).
 - ✅ Tests cover new behavior and edge cases.
 - ✅ Code is readable, maintainable, and consistent with existing style.
 - ✅ Public APIs and user-facing behavior changes are documented.
