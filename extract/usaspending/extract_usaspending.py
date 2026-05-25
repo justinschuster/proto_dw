@@ -20,7 +20,7 @@ def usaspending(base_url: str = dlt.config.value) -> Any:
             USAspending-compatible environment.
 
     Returns:
-        A dlt source containing the `def_codes` resource.
+        A dlt source containing the `def_codes` and `disaster_overview` resources.
     """
 
     def _get_json(path: str) -> StrAny:
@@ -61,7 +61,25 @@ def usaspending(base_url: str = dlt.config.value) -> Any:
 
         yield from codes
 
-    return get_def_codes()
+    @dlt.resource(
+        name="disaster_overview",
+        write_disposition="append",
+    )
+    def get_disaster_overview() -> Iterator[TDataItems]:
+        """Yield the raw Disaster/Emergency overview response from USAspending.gov.
+
+        Returns:
+            An iterator containing the endpoint response exactly as returned by the API.
+        """
+        payload = _get_json("disaster/overview/")
+        if not payload:
+            msg = "Disaster overview endpoint returned no data"
+            logger.error(msg)
+            raise ValueError(msg)
+
+        yield payload
+
+    return get_def_codes(), get_disaster_overview()
 
 
 def load_data(pipeline: Any, data: Any) -> Any:
